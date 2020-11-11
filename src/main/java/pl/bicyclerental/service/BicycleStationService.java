@@ -5,6 +5,7 @@ import static pl.bicyclerental.model.Status.OCCUPIED;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,18 +43,12 @@ public class BicycleStationService {
     return objectMapper.convertValue(bicycleStation, BicycleStationDto.class);
   }
 
-  public BicycleRentalResponseDto getSummary() {
+  public List<BicycleRentalResponseDto> createSummary() {
     List<BicycleStation> stations = bicycleStationRepository.findAll();
 
-    var freeStands = extractCountOfStands(stations, FREE);
-    var occupiedStands = extractCountOfStands(stations, OCCUPIED);
-    var freeBicycles = extractCountOfBicycles(stations, FREE);
-
-    return BicycleRentalResponseDto.builder()
-        .freeStands(freeStands)
-        .occupiedStands(occupiedStands)
-        .freeBicycles(freeBicycles)
-        .build();
+    return stations.stream()
+        .map(buildBicycleRentalResponseDtoFunction())
+        .collect(Collectors.toList());
   }
 
   public BicycleStationDto update(Long id, BicycleStationUpdateDto updateDto) {
@@ -77,24 +72,26 @@ public class BicycleStationService {
     bicycleStationRepository.deleteById(id);
   }
 
-  private long extractCountOfStands(List<BicycleStation> stations, Status status) {
-    return stations.stream()
-        .map(BicycleStation::getBicycleStands)
-        .collect(Collectors.toList())
-        .stream()
-        .flatMap(
-            bicycleStands ->
-                bicycleStands.stream()
-                    .filter(bicycleStand -> bicycleStand.getStandStatus().equals(status)))
+  private Function<BicycleStation, BicycleRentalResponseDto>
+      buildBicycleRentalResponseDtoFunction() {
+    return bicycleStation ->
+        BicycleRentalResponseDto.builder()
+            .name(bicycleStation.getName())
+            .freeStands(extractCountOfStands(bicycleStation, FREE))
+            .freeBicycles(extractCountOfBicycles(bicycleStation, FREE))
+            .occupiedStands(extractCountOfStands(bicycleStation, OCCUPIED))
+            .build();
+  }
+
+  private long extractCountOfStands(BicycleStation bicycleStation, Status status) {
+    return bicycleStation.getBicycleStands().stream()
+        .filter(bicycleStand -> bicycleStand.getStandStatus().equals(status))
         .count();
   }
 
-  private long extractCountOfBicycles(List<BicycleStation> stations, Status status) {
-    return stations.stream().map(BicycleStation::getBicycles).collect(Collectors.toList()).stream()
-        .flatMap(
-            bicycleStands ->
-                bicycleStands.stream()
-                    .filter(bicycleStand -> bicycleStand.getBicycleStatus().equals(status)))
+  private long extractCountOfBicycles(BicycleStation bicycleStation, Status status) {
+    return bicycleStation.getBicycles().stream()
+        .filter(bicycle -> bicycle.getBicycleStatus().equals(status))
         .count();
   }
 }

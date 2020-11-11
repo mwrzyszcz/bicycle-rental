@@ -1,5 +1,6 @@
 package pl.bicyclerental.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,7 +55,7 @@ public class BicycleStationController {
   }
 
   @GetMapping(path = "/summary", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BicycleRentalResponseDto> summary() {
-    return ResponseEntity.ok(bicycleStationService.getSummary());
+  public ResponseEntity<List<BicycleRentalResponseDto>> summary() {
+    return ResponseEntity.ok(bicycleStationService.createSummary());
   }
 }

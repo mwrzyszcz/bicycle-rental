@@ -7,6 +7,7 @@ import lombok.*;
 @Setter
 public class BicycleRentalResponseDto {
 
+  private String name;
   private long freeStands;
   private long occupiedStands;
   private long freeBicycles;

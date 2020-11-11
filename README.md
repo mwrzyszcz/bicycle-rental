@@ -12,7 +12,7 @@ API structure:
 
 ### How to use
 
-#### 1. Clone repository
+#### 1. Clone repository `$ git clone https://github.com/mwrzyszcz/bicycle-rental.git`
 
 #### 2. Run application
 
@@ -173,17 +173,24 @@ Response:
 `200 OK`
 
 ```json5
-{
-  "freeStands": 2,
-  "occupiedStands": 2,
-  "freeBicycles": 3
-}
+[
+  {
+    "name": "Station1",
+    "freeStands": 1,
+    "occupiedStands": 1,
+    "freeBicycles": 2
+  },
+  {
+    "name": "Station2",
+    "freeStands": 2,
+    "occupiedStands": 1,
+    "freeBicycles": 2
+  }
+]
 ```
 
 ---
 
 ## Notes
 
-###### Daily rate limit: 50 requests
-
-###### Using [accuweather API](https://developer.accuweather.com/)
+Feel free to use.
